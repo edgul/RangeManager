@@ -10,15 +10,10 @@ public:
     ~Range();
 
     void clear();
-    void setStart(int start);
-    void setEnd(int end);
-
-    int start();
-    int end();
     bool valid();
-    void print();
 
     std::vector<int> toVec();
+    std::string toStr();
 
 private:
     int start_;

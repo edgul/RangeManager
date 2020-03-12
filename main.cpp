@@ -10,23 +10,38 @@ void test1(RangeManager &rm);
 void testMerge();
 void testUnique();
 void testToVec();
-
+void testBasicAddDel(RangeManager &rm);
 
 
 int main(int /*argc*/, char * /*argv*/[])
 {
-    std::cout << "Hello world" << std::endl;
-
     RangeManager rm;
 
-    std::vector<int> data = { 1, 2, 3, 4, 5, 4, 10 };
-    std::vector<int> data2 = { 1, 2, 6 };
+    rm.add(6,8);
+    rm.add(1,4);
+    rm.add(10,15);
+    rm.add(9,12);
 
-    rm.add(3,5);
-    rm.add(8,10);
-    // rm.printRanges();
+    Util::printRanges(rm.get(1,5));
+    std::cout << std::endl;
 
     return 0;
+}
+
+void testBasicAddDel(RangeManager &rm)
+{
+    rm.add(1,5);
+    rm.add(8,10);
+    rm.add(20, 19);
+    rm.add(-1,0);
+    rm.add(-5,-3);
+    Util::printVec(rm.toVec());
+
+    rm.del(3, 7);
+    rm.del(8, 9);
+    rm.del(0,0);
+    rm.del(-5,-4);
+    Util::printVec(rm.toVec());
 }
 
 void test1(RangeManager &rm)
@@ -40,9 +55,9 @@ void test1(RangeManager &rm)
     std::vector<Range *> ranges1 = { r1.get(), r2.get(), r3.get(), r4.get() };
     std::vector<Range *> ranges2 = { r1.get() };
 
-    rm.printRanges(ranges0);
-    rm.printRanges(ranges1);
-    rm.printRanges(ranges2);
+    Util::printRanges(ranges0);
+    Util::printRanges(ranges1);
+    Util::printRanges(ranges2);
 }
 
 void testMerge()
@@ -51,7 +66,7 @@ void testMerge()
     std::vector<int> data = { 3, 3, 3, 3, 3, 3, 10 };
     std::vector<int> data2 = { 1, 2, 6 };
     std::merge(data.begin(), data.end(), data2.begin(), data2.end(), std::back_inserter(res));
-    Util::print(res);
+    Util::printVec(res);
 }
 
 void testUnique()
@@ -60,17 +75,17 @@ void testUnique()
     std::vector<int> res;
     auto last = std::unique(data.begin(), data.end());
     data.erase(last, data.end());
-    Util::print(res);
+    Util::printVec(res);
 }
 
 void testToVec()
 {
     Range r1(10, 12);
-    Util::print(r1.toVec());
+    Util::printVec(r1.toVec());
 
     Range r2(5,20);
-    Util::print(r2.toVec());
+    Util::printVec(r2.toVec());
 
     Range r3(0,0);
-    Util::print(r3.toVec());
+    Util::printVec(r3.toVec());
 }

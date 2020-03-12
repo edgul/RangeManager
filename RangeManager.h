@@ -12,14 +12,10 @@ public:
     void add(int start, int end);
     void del(int start, int end);
     std::vector<Range*> get(int start, int end);
-
-    void printRanges();
-    static void printRanges(std::vector<Range*> ranges);
+    std::vector<int> toVec();
 
 private:
-    std::vector<Range*> ranges_;
-
-    std::vector<int> rangesToVec();
+    std::vector<int> ranges_;
 
 };
 

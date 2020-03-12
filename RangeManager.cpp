@@ -2,12 +2,8 @@
 
 #include <iostream>
 #include <algorithm>
+#include <iterator>
 #include "Util.h"
-
-bool notSucc(int x, int y)
-{
-    return (y != x + 1);
-}
 
 RangeManager::RangeManager()
 {
@@ -20,55 +16,31 @@ void RangeManager::add(int start, int end)
     if (!range->valid())
     {
         std::cout << "Invalid range provided (add): ";
-        range->print();
+        std::cout << range->toStr().c_str();
         std::cout << std::endl;
         return;
     }
 
-    std::vector<int> newRangeVec = range->toVec();
-    std::vector<int> currentRanges = rangesToVec();
+    std::vector<int> add = range->toVec();
+    std::cout << "Adding: ";
+    Util::printVec(add);
 
-    // merge
+    // merge (keeps sorted)
     std::vector<int> newRanges;
-    std::merge(newRangeVec.begin(), newRangeVec.end(),
-               currentRanges.begin(), currentRanges.end(),
+    std::merge(add.begin(), add.end(),
+               ranges_.begin(), ranges_.end(),
                std::back_inserter(newRanges));
 
     // remove duplicates
     auto last = std::unique(newRanges.begin(), newRanges.end());
     newRanges.erase(last, newRanges.end());
 
-    std::cout << "Adding: " ;
-    Util::print(newRangeVec);
+    // TODO: copy is expensive
+    ranges_ = newRanges;
 
-    std::cout << "Old: ";
-    Util::print((currentRanges));
-
-    std::cout << "New range: ";
-    Util::print(newRanges);
-
-    ranges_.clear();
-
-    auto first = newRanges.begin();
-    auto n = newRanges.begin();
-
-    n = std::adjacent_find(n, newRanges.end(), notSucc);
-    std::cout << "First: " << *first << ", N: " << *(std::prev(n)) << std::endl;
-    ranges_.push_back(new Range(*first, *(std::prev(n))));
-
-    while (n < newRanges.end());
-    {
-        std::cout << "Looking" << std::endl;
-        first = n;
-        // n = std::adjacent_find(n, newRanges.end(), notSucc);
-        //std::cout << "first: " << *first << ", N: " << *(n-1);
-        std::cout << "Pushing";
-        // ranges_.push_back(new Range(*first, *(n-1)));
-
-    }
-
-    std::cout << "Done add" << std::endl;
-
+    std::cout << " => "
+              << Util::vecToStr(ranges_).c_str()
+              << std::endl;
 }
 
 void RangeManager::del(int start, int end)
@@ -77,7 +49,7 @@ void RangeManager::del(int start, int end)
     if (!range->valid())
     {
         std::cout << "Invalid range provided (del): ";
-        range->print();
+        std::cout << range->toStr().c_str();
         std::cout << std::endl;
         return;
     }
@@ -88,6 +60,21 @@ void RangeManager::del(int start, int end)
         return;
     }
 
+    std::vector<int> remove = range->toVec();
+    std::cout << "Deleting: ";
+    Util::printVec(remove);
+
+    std::vector<int> newRange;
+    std::set_difference(ranges_.begin(), ranges_.end(),
+                        remove.begin(), remove.end(),
+                        std::inserter(newRange, newRange.begin()));
+
+    // TODO: copy is expensive
+    ranges_ = newRange;
+
+    std::cout << " => "
+              << Util::vecToStr(ranges_).c_str()
+              << std::endl;
 
 }
 
@@ -98,39 +85,36 @@ std::vector<Range *> RangeManager::get(int start, int end)
     if (!range->valid())
     {
         std::cout << "Invalid range provided (get): ";
-        range->print();
+        std::cout << range->toStr().c_str();
         std::cout << std::endl;
         return std::vector<Range*>();
     }
 
-    return std::vector<Range*>();
-}
+    std::vector<Range*> result;
+    std::vector<int> current = ranges_;
 
-void RangeManager::printRanges()
-{
-    std::cout << "Printing ranges: ";
-    printRanges(ranges_);
-}
-
-void RangeManager::printRanges(std::vector<Range *> ranges)
-{
-    std::cout << "[";
-    for (auto it = ranges.begin(); it < ranges.end(); it++)
+    auto notSucc = [](int x, int y)
     {
-        (*it)->print();
+        return (y != x + 1);
+    };
 
-        if (it != ranges.end()-1) std::cout << ", ";
-    }
-    std::cout << "]" << std::endl;
-}
-
-std::vector<int> RangeManager::rangesToVec()
-{
-    std::vector<int> result;
-    for (Range * range : ranges_)
+    // TODO: improve
+    auto first = current.begin();
+    auto n = std::adjacent_find(first, current.end(), notSucc);
+    while (n != current.end())
     {
-        std::vector<int> rVec = range->toVec();
-        result.insert(std::end(result), std::begin(rVec), std::end(rVec));
+        result.push_back(new Range(*first, *n+1));
+        first = n+1;
+        n = std::adjacent_find(first, current.end(), notSucc);
     }
+    n = current.end() - 1;
+    result.push_back(new Range(*first, *n+1));
+
     return result;
 }
+
+std::vector<int> RangeManager::toVec()
+{
+    return ranges_;
+}
+
