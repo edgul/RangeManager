@@ -3,6 +3,7 @@
 #include <iostream>
 #include <algorithm>
 #include <iterator>
+#include <memory>
 #include "Util.h"
 
 RangeManager::RangeManager()

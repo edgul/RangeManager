@@ -2,6 +2,7 @@
 #define RANGE_H
 
 #include <vector>
+#include <string>
 
 class Range
 {
@@ -11,9 +12,11 @@ public:
 
     void clear();
     bool valid();
-
     std::vector<int> toVec();
     std::string toStr();
+
+    int getStart();
+    int getEnd();
 
 private:
     int start_;

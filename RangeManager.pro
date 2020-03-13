@@ -1,6 +1,6 @@
 QT -= gui
 
-CONFIG += c++98 console
+CONFIG += console
 CONFIG -= app_bundle
 
 # The following define makes your compiler emit warnings if you use
@@ -17,6 +17,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         Range.cpp \
         RangeManager.cpp \
+        RangeManagerTest.cpp \
         Util.cpp \
         main.cpp
 
@@ -28,6 +29,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     Range.h \
     RangeManager.h \
+    RangeManagerTest.h \
     Util.h
 
 DISTFILES += \

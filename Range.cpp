@@ -45,3 +45,13 @@ std::string Range::toStr()
     str << "(" << start_ << ", " << end_ << ")";
     return str.str();
 }
+
+int Range::getStart()
+{
+    return start_;
+}
+
+int Range::getEnd()
+{
+    return end_;
+}
