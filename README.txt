@@ -2,18 +2,14 @@
 Assumptions:
 * Valid Range: start < end
 * Integer-only ranges
-
-C++17
-MSVC
+* C++: 14 or 17
+* Compilers: MSVC or GCC
 
 // TODO:
-* Add testing
+* Add testing... use framework
 * Optimizations
 -> Performance (Speed and Footprint)
 -> Leaks
 * Measure complexity
 * Internal Representation?
-* C++11/14?
-* Port from qt .pro
 * Switch for debug
-* Other compilers
