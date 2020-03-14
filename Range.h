@@ -11,15 +11,14 @@ public:
     ~Range();
 
     void clear();
-    const bool valid();
-    std::vector<int> toVec();
-    const std::string toStr();
+    bool valid() const;
+    std::vector<int> toVec() const;
+    std::string toStr() const;
 
-    const int getStart();
-    const int getEnd();
+    int getStart() const;
+    int getEnd() const;
 
-    bool intersects(Range& otherRange) ;
-
+    bool intersects(Range& otherRange) const;
     bool operator==(const Range& rhs) const;
 
 private:

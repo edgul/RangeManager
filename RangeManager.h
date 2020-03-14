@@ -9,10 +9,11 @@ class RangeManager
 public:
     explicit RangeManager();
 
+    void clear();
     void add(int start, int end);
     void del(int start, int end);
-    std::vector<Range*> get(int start, int end);
-    std::vector<int> toVec();
+    std::vector<Range*> get(int start, int end) const;
+    std::vector<int> toVec() const;
 
 private:
     std::vector<int> ranges_;

@@ -6,6 +6,8 @@
 
 namespace Util {
 
+std::vector<int> genSequence(int start, int end);
+
 void printVec(std::vector<int> v);
 void printRanges(std::vector<Range*> ranges);
 

@@ -11,6 +11,11 @@ RangeManager::RangeManager()
 
 }
 
+void RangeManager::clear()
+{
+    ranges_.clear();
+}
+
 void RangeManager::add(int start, int end)
 {
     auto range = std::make_unique<Range>(start, end);
@@ -79,7 +84,7 @@ void RangeManager::del(int start, int end)
 
 }
 
-std::vector<Range *> RangeManager::get(int start, int end)
+std::vector<Range *> RangeManager::get(int start, int end) const
 {
     auto range = std::make_unique<Range>(start, end);
 
@@ -124,7 +129,7 @@ std::vector<Range *> RangeManager::get(int start, int end)
     return result;
 }
 
-std::vector<int> RangeManager::toVec()
+std::vector<int> RangeManager::toVec() const
 {
     return ranges_;
 }

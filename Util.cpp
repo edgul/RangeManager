@@ -3,8 +3,21 @@
 #include <iostream>
 #include <sstream>
 #include <iterator>
+#include <algorithm>
 
 namespace Util {
+
+std::vector<int> genSequence(int start, int end)
+{
+    int i = start;
+    auto f = [&]() {
+        return i++;
+    };
+
+    std::vector<int> v(end-start);
+    std::generate(v.begin(), v.end(), f);
+    return v;
+}
 
 void printVec(std::vector<int> v)
 {

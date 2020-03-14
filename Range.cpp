@@ -24,12 +24,12 @@ void Range::clear()
     end_ = 0;
 }
 
-const bool Range::valid()
+bool Range::valid() const
 {
     return start_ < end_;
 }
 
-std::vector<int> Range::toVec()
+std::vector<int> Range::toVec() const
 {
     if (!valid())
     {
@@ -40,24 +40,24 @@ std::vector<int> Range::toVec()
     return span;
 }
 
-const std::string Range::toStr()
+std::string Range::toStr() const
 {
     std::stringstream str;
     str << "(" << start_ << ", " << end_ << ")";
     return str.str();
 }
 
-const int Range::getStart()
+int Range::getStart() const
 {
     return start_;
 }
 
-const int Range::getEnd()
+int Range::getEnd() const
 {
     return end_;
 }
 
-bool Range::intersects(Range &otherRange)
+bool Range::intersects(Range &otherRange) const
 {
     std::vector<int> intersection;
     const std::vector<int> thisVec = toVec();
