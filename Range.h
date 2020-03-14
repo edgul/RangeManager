@@ -18,8 +18,11 @@ public:
     int getStart() const;
     int getEnd() const;
 
+    bool contains(int value);
     bool intersects(Range& otherRange) const;
     bool operator==(const Range& rhs) const;
+
+    int size() const;
 
 private:
     int start_;

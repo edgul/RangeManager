@@ -3,19 +3,15 @@
 #include <iostream>
 #include <sstream>
 #include <iterator>
+#include <numeric>
 #include <algorithm>
 
 namespace Util {
 
 std::vector<int> genSequence(int start, int end)
 {
-    int i = start;
-    auto f = [&]() {
-        return i++;
-    };
-
     std::vector<int> v(end-start);
-    std::generate(v.begin(), v.end(), f);
+    std::iota(v.begin(), v.end(), start);
     return v;
 }
 

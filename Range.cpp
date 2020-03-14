@@ -57,21 +57,43 @@ int Range::getEnd() const
     return end_;
 }
 
+bool Range::contains(int value)
+{
+    return (value >= start_ && value < end_);
+}
+
 bool Range::intersects(Range &otherRange) const
 {
-    std::vector<int> intersection;
-    const std::vector<int> thisVec = toVec();
-    std::vector<int> otherVec = otherRange.toVec();
-    std::set_intersection(thisVec.begin(), thisVec.end(),
-                          otherVec.begin(), otherVec.end(),
-                          std::back_inserter(intersection));
-    return intersection.size() > 0;
+    bool inter = false;
+
+    if (size() == 0 || otherRange.size() == 0)
+    {
+        return false;
+    }
+
+    Range smallerRange = (size() >= otherRange.size()) ? otherRange : Range(start_, end_);
+    Range biggerRange = (size() >= otherRange.size()) ? Range(start_, end_) : otherRange;
+
+    for (int i = smallerRange.getStart(); i < smallerRange.getEnd(); i++)
+    {
+        if (biggerRange.contains(i))
+        {
+            inter = true;
+            break;
+        }
+    }
+    return inter;
 }
 
 bool Range::operator==(const Range &rhs) const
 {
     return this->start_ == rhs.start_ &&
             this->end_ == rhs.end_;
+}
+
+int Range::size() const
+{
+    return end_ - start_;
 }
 
 

@@ -89,6 +89,44 @@ TEST_CASE( "Range test", "[Range]" )
         REQUIRE(rInvalid1.valid() == false);
     }
 
+    SECTION("Range Contains")
+    {
+        for (int i : Util::genSequence(-1000,0))
+        {
+            REQUIRE(r2.contains(i) == false);
+        }
+        REQUIRE(r2.contains(0) == false);
+        REQUIRE(r2.contains(1) == true);
+        REQUIRE(r2.contains(2) == true);
+        REQUIRE(r2.contains(3) == true);
+        REQUIRE(r2.contains(4) == false);
+        for (int i : Util::genSequence(5, 1000))
+        {
+            REQUIRE(r2.contains(i) == false);
+        }
+
+        for (int i : Util::genSequence(-1000, -6))
+        {
+            REQUIRE(r10.contains(i) == false);
+        }
+        REQUIRE(r10.contains(-6) == false);
+        REQUIRE(r10.contains(-5) == true);
+        REQUIRE(r10.contains(-4) == true);
+        REQUIRE(r10.contains(-3) == true);
+        REQUIRE(r10.contains(-2) == true);
+        REQUIRE(r10.contains(-1) == true);
+        REQUIRE(r10.contains(0) == true);
+        REQUIRE(r10.contains(1) == false);
+        for (int i : Util::genSequence(2, 1000))
+        {
+            REQUIRE(r10.contains(i) == false);
+        }
+
+        REQUIRE(rInvalid0.contains(-1) == false);
+        REQUIRE(rInvalid0.contains(0) == false);
+        REQUIRE(rInvalid0.contains(1) == false);
+    }
+
     SECTION("Range intersects")
     {
         REQUIRE(r1.intersects(r2) == true);
@@ -96,12 +134,25 @@ TEST_CASE( "Range test", "[Range]" )
         REQUIRE(r2.intersects(r2) == true);
 
         REQUIRE(r9.intersects(r1) == false);
+        REQUIRE(r1.intersects(r9) == false);
         REQUIRE(r9.intersects(r2) == true);
+        REQUIRE(r2.intersects(r9) == true);
 
         REQUIRE(r10.intersects(r1) == false);
         REQUIRE(r1.intersects(r10) == false);
         REQUIRE(r10.intersects(r3) == true);
         REQUIRE(r3.intersects(r10) == true);
+        REQUIRE(r10.intersects(r2) == false);
+        REQUIRE(r2.intersects(r10) == false);
+        REQUIRE(r10.intersects(rInvalid0) == false);
+        REQUIRE(rInvalid0.intersects(r10) == false);
+        REQUIRE(r3.intersects(rInvalid0) == false);
+        REQUIRE(rInvalid0.intersects(r3) == false);
+
+        REQUIRE(r1.intersects(r3) == true);
+        REQUIRE(r3.intersects(r1) == true);
+        REQUIRE(r2.intersects(r3) == true);
+        REQUIRE(r3.intersects(r2) == true);
     }
 
     SECTION("Range toVec")
