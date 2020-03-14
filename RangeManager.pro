@@ -17,7 +17,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         Range.cpp \
         RangeManager.cpp \
-        RangeManagerTest.cpp \
+        Tests.cpp \
         Util.cpp \
         main.cpp
 
@@ -29,8 +29,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     Range.h \
     RangeManager.h \
-    RangeManagerTest.h \
-    Util.h
+    Util.h \
+    catch.hpp
 
 DISTFILES += \
     README.txt

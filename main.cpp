@@ -4,8 +4,14 @@
 #include <algorithm>
 #include <iterator>
 #include "RangeManager.h"
-#include "RangeManagerTest.h"
 #include "Util.h"
+
+#define CATCH_CONFIG_MAIN // Enable this line for testing
+#include "catch.hpp"
+
+#ifdef CATCH_CONFIG_MAIN
+#include "Tests.cpp"
+#endif
 
 void test1();
 void testMerge();
@@ -13,7 +19,7 @@ void testUnique();
 void testToVec();
 void testBasicAddDel(RangeManager &rm);
 
-
+#ifndef CATCH_CONFIG_MAIN
 int main(int /*argc*/, char * /*argv*/[])
 {
     RangeManager rm;
@@ -31,6 +37,7 @@ int main(int /*argc*/, char * /*argv*/[])
 
     return 0;
 }
+#endif
 
 void testBasicAddDel(RangeManager &rm)
 {
