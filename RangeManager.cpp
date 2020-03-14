@@ -99,17 +99,27 @@ std::vector<Range *> RangeManager::get(int start, int end)
         return (y != x + 1);
     };
 
-    // TODO: improve
+    // TODO: improve: alg and pointers
     auto first = current.begin();
     auto n = std::adjacent_find(first, current.end(), notSucc);
     while (n != current.end())
     {
-        result.push_back(new Range(*first, *n+1));
+        Range *r = new Range(*first, *n+1);
+        Range r2 = Range(start,end);
+        if (r->intersects(r2))
+        {
+            result.push_back(r);
+        }
         first = n+1;
         n = std::adjacent_find(first, current.end(), notSucc);
     }
     n = current.end() - 1;
-    result.push_back(new Range(*first, *n+1));
+    Range *r = new Range(*first, *n+1);
+    Range r2 = Range(start,end);
+    if (r->intersects(r2))
+    {
+        result.push_back(r);
+    }
 
     return result;
 }

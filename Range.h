@@ -11,16 +11,21 @@ public:
     ~Range();
 
     void clear();
-    bool valid();
+    const bool valid();
     std::vector<int> toVec();
-    std::string toStr();
+    const std::string toStr();
 
-    int getStart();
-    int getEnd();
+    const int getStart();
+    const int getEnd();
+
+    bool intersects(Range& otherRange) ;
+
+    bool operator==(const Range& rhs) const;
 
 private:
     int start_;
     int end_;
 };
+
 
 #endif // RANGE_H

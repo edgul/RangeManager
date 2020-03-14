@@ -14,10 +14,7 @@
 #endif
 
 void test1();
-void testMerge();
-void testUnique();
-void testToVec();
-void testBasicAddDel(RangeManager &rm);
+
 
 #ifndef CATCH_CONFIG_MAIN
 int main(int /*argc*/, char * /*argv*/[])
@@ -39,21 +36,6 @@ int main(int /*argc*/, char * /*argv*/[])
 }
 #endif
 
-void testBasicAddDel(RangeManager &rm)
-{
-    rm.add(1,5);
-    rm.add(8,10);
-    rm.add(20, 19);
-    rm.add(-1,0);
-    rm.add(-5,-3);
-    Util::printVec(rm.toVec());
-
-    rm.del(3, 7);
-    rm.del(8, 9);
-    rm.del(0,0);
-    rm.del(-5,-4);
-    Util::printVec(rm.toVec());
-}
 
 void test1()
 {
@@ -71,32 +53,4 @@ void test1()
     Util::printRanges(ranges2);
 }
 
-void testMerge()
-{
-    std::vector<int> res;
-    std::vector<int> data = { 3, 3, 3, 3, 3, 3, 10 };
-    std::vector<int> data2 = { 1, 2, 6 };
-    std::merge(data.begin(), data.end(), data2.begin(), data2.end(), std::back_inserter(res));
-    Util::printVec(res);
-}
 
-void testUnique()
-{
-    std::vector<int> data = { 1, 1, 3, 4, 5, 4, 10 };
-    std::vector<int> res;
-    auto last = std::unique(data.begin(), data.end());
-    data.erase(last, data.end());
-    Util::printVec(res);
-}
-
-void testToVec()
-{
-    Range r1(10, 12);
-    Util::printVec(r1.toVec());
-
-    Range r2(5,20);
-    Util::printVec(r2.toVec());
-
-    Range r3(0,0);
-    Util::printVec(r3.toVec());
-}

@@ -12,7 +12,7 @@ Uses Testing Framework: Catch
 * For test/main build un/comment line: #define CATCH_CONFIG_MAIN 
 
 // TODO:
-* Add more testing
+* Add more testing (del and get; simplify existing code)
 * Optimizations
 -> Performance (Speed and Footprint)
 -> Leaks
