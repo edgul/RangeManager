@@ -15,31 +15,24 @@ public:
     std::vector<int> toVec() const;
     std::string toStr() const;
 
-    void setStart(int start);
-    void setEnd(int end);
-    int getStart() const;
-    int getEnd() const;
+    int size() const;
+    int start() const;
+    int end() const;
 
     bool contains(int value) const;
-    bool lower(int value) const;
-    bool higher(int value) const;
-
-    bool hasHigher(const Range& other) const;
-    bool hasLower(const Range& other) const;
     bool intersects(const Range &otherRange) const;
+    bool willMergeWith(const Range &other) const;
+    void mergeWith(const Range&other);
+    std::vector<Range> del(const Range& delRange);
+
     bool operator==(const Range& rhs) const;
-
-    int size() const;
-
-    std::vector<Range> add(const Range& other) const;
-
-    static Range shorter(const Range& r1, const Range&r2);
-    static Range longer(const Range& r1, const Range&r2);
-
 
 private:
     int start_;
     int end_;
+
+    Range shorter(const Range& r1, const Range&r2) const;
+    Range longer(const Range& r1, const Range&r2) const;
 };
 
 

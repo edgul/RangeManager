@@ -13,7 +13,6 @@ Range::Range(int start, int end) : start_(start), end_(end)
 
 Range::~Range()
 {
-    // TODO: optimize
     // std::cout << "Range being destroyed: ";
     // print();
     // std::cout << std::endl;
@@ -48,22 +47,18 @@ std::string Range::toStr() const
     return str.str();
 }
 
-void Range::setStart(int start)
+int Range::size() const
 {
-    start_ = start;
+    if (!valid()) return 0;
+    return end_ - start_;
 }
 
-void Range::setEnd(int end)
-{
-    end_ = end;
-}
-
-int Range::getStart() const
+int Range::start() const
 {
     return start_;
 }
 
-int Range::getEnd() const
+int Range::end() const
 {
     return end_;
 }
@@ -71,34 +66,6 @@ int Range::getEnd() const
 bool Range::contains(int value) const
 {
     return (value >= start_ && value < end_);
-}
-
-bool Range::lower(int value) const
-{
-    return (value < start_);
-}
-
-bool Range::higher(int value) const
-{
-    return (value >= end_);
-}
-
-bool Range::hasHigher(const Range &other) const
-{
-    for (int i = other.getStart(); i < other.getEnd(); i++)
-    {
-        if (higher(i)) return true;
-    }
-    return false;
-}
-
-bool Range::hasLower(const Range &other) const
-{
-    for (int i = other.getStart(); i < other.getEnd(); i++)
-    {
-        if (lower(i)) return true;
-    }
-    return false;
 }
 
 bool Range::intersects(const Range &otherRange) const
@@ -113,7 +80,7 @@ bool Range::intersects(const Range &otherRange) const
     Range smallerRange = shorter(Range(start_,end_), otherRange);
     Range biggerRange = longer(Range(start_,end_), otherRange);
 
-    for (int i = smallerRange.getStart(); i < smallerRange.getEnd(); i++)
+    for (int i = smallerRange.start(); i < smallerRange.end(); i++)
     {
         if (biggerRange.contains(i))
         {
@@ -124,87 +91,108 @@ bool Range::intersects(const Range &otherRange) const
     return inter;
 }
 
-bool Range::operator==(const Range &rhs) const
+bool Range::willMergeWith(const Range &other) const
 {
-    return this->start_ == rhs.start_ &&
-            this->end_ == rhs.end_;
+    if (size() == 0 || other.size() == 0)
+    {
+        return true;
+    }
+
+    return intersects(other) || start_ == other.end() || end_ == other.start();
 }
 
-int Range::size() const
+void Range::mergeWith(const Range &other)
 {
-    if (!valid()) return 0;
-
-    return end_ - start_;
-}
-
-std::vector<Range> Range::add(const Range &other) const
-{
-    Range thisRange = Range(start_, end_);
-
     // one range is empty
     if (size() == 0)
     {
-        return std::vector<Range>{other};
+        start_ = other.start();
+        end_ = other.end();
+        return;
     }
     else if (other.size() == 0)
     {
-        return std::vector<Range>{thisRange};
+        return;
     }
 
     std::vector<Range> result;
-    if (contains(other.getStart())) // overlap other start-bounded
+    if (contains(other.start())) // overlap - other start-bounded
     {
-        if (contains(other.getEnd()-1)) // same size or this is larger
+        if (!contains(other.end()-1)) // other has higher end
         {
-            result.push_back(thisRange);
+            end_ = other.end();
         }
-        else // other higher
-        {
-            Range newRange(thisRange.getStart(), other.getEnd());
-            result.push_back(newRange);
-        }
+        // else other is contained or equal to "this"
     }
-    else if (contains(other.getEnd()-1)) // overlap other end-bounded
+    else if (contains(other.end()-1)) // overlap other end-bounded
     {
-        Range newRange(other.getStart(), thisRange.getEnd());
-        result.push_back(newRange);
+        start_ = other.start();
     }
-    else if (end_ == other.getStart()) // end-to-end - other higher
+    else if (end_ == other.start()) // end-to-end - other higher
     {
-        Range newRange(thisRange.getStart(), other.getEnd());
-        result.push_back(newRange);
+        end_ = other.end();
     }
-    else if (start_ == other.getEnd()) // end-to-end - other lower
+    else if (start_ == other.end()) // end-to-end - other lower
     {
-        Range newRange(other.getStart(), thisRange.getEnd());
-        result.push_back(newRange);
+        start_ = other.start();
     }
-    else if (start_ > other.getStart()) // no overlap - other lower
+    else // other contains "this"
     {
-        result.push_back(other);
-        result.push_back(thisRange);
+        start_ = other.start();
+        end_ = other.end();
     }
-    else if (start_ < other.getStart()) // no overlap - other higher
-    {
-        result.push_back(thisRange);
-        result.push_back(other);
-    }
-    else
-    {
-        assert(false);
-    }
-
-    return result;
 }
 
-Range Range::shorter(const Range &r1, const Range &r2)
+std::vector<Range> Range::del(const Range &delRange)
+{
+    if (!delRange.valid() || !intersects(delRange))
+    {
+        return std::vector<Range>{ Range(start_, end_) };
+    }
+
+    std::vector<Range> ranges;
+    if (delRange.contains(start_)) // overlap
+    {
+        if (delRange.contains(end_- 1)) // delRange contains "this" or equal
+        {
+            return std::vector<Range>();
+        }
+        else // delRange is lower than "this"
+        {
+            Range newRange(delRange.end(), end_);
+            ranges.push_back(newRange);
+        }
+    }
+    else if (delRange.contains(end_)) // overlap -- delRange higher than "this"
+    {
+        Range newRange(start_, delRange.start());
+        ranges.push_back(newRange);
+    }
+    else // delRange within "this"
+    {
+        Range newRange1(start_, delRange.start());
+        Range newRange2(delRange.end(), end_);
+        ranges.push_back(newRange1);
+        ranges.push_back(newRange2);
+    }
+
+    return ranges;
+}
+
+Range Range::shorter(const Range &r1, const Range &r2) const
 {
     return (r1.size() >= r2.size()) ? r2 : r1;
 }
 
-Range Range::longer(const Range &r1, const Range &r2)
+Range Range::longer(const Range &r1, const Range &r2) const
 {
     return (r1.size() >= r2.size()) ? r1 : r2;
+}
+
+bool Range::operator==(const Range &rhs) const
+{
+    return this->start_ == rhs.start_ &&
+            this->end_ == rhs.end_;
 }
 
 

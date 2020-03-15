@@ -13,8 +13,10 @@ Integer-only ranges
 
 --- Building:
 
-C++: 14, 17
-Compilers: MSVC, GCC
+Tested on:
+* C++: 14, 17
+* Compilers: MSVC, GCC
+* Windows
 
 Building with Qt (MSVC):
 1. Set .pro file line: "DEFINES += TEST_BUILD" as desired for main or test build
@@ -30,9 +32,6 @@ Building with CLI (g++):
 --- TODO:
 
 * Optimizations
--> Performance (Speed and Footprint)
--> Leaks
-* Measure complexity
-* Internal Representation?
+-> Leaks/copies
 * Debug switch for live printing
 * Test on Linux

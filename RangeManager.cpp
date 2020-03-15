@@ -16,7 +16,55 @@ void RangeManager::clear()
     ranges_.clear();
 }
 
+void RangeManager::clearLinear()
+{
+    rangesLinear_.clear();
+}
+
 void RangeManager::add(int start, int end)
+{
+    Range newRange(start, end);
+    if (!newRange.valid())
+    {
+        return;
+    }
+
+    std::vector<Range> ranges;
+    bool newRangeAdded = false;
+    for (auto const& range : ranges_)
+    {
+        if (newRangeAdded)
+        {
+            ranges.push_back(range);
+        }
+        else
+        {
+            if (range.willMergeWith(newRange))
+            {
+                newRange.mergeWith(range);
+            }
+            else if (range.start() < newRange.start())
+            {
+                ranges.push_back(range);
+            }
+            else
+            {
+                ranges.push_back(newRange);
+                ranges.push_back(range);
+                newRangeAdded = true;
+            }
+        }
+    }
+
+    if(!newRangeAdded)
+    {
+        ranges.push_back(newRange);
+    }
+
+    ranges_ = ranges;
+}
+
+void RangeManager::addLinear(int start, int end)
 {
     auto range = std::make_unique<Range>(start, end);
     if (!range->valid())
@@ -34,22 +82,21 @@ void RangeManager::add(int start, int end)
     // merge (keeps sorted)
     std::vector<int> newRanges;
     std::merge(add.begin(), add.end(),
-               ranges_.begin(), ranges_.end(),
+               rangesLinear_.begin(), rangesLinear_.end(),
                std::back_inserter(newRanges));
 
     // remove duplicates
     auto last = std::unique(newRanges.begin(), newRanges.end());
     newRanges.erase(last, newRanges.end());
 
-    // TODO: copy is expensive
-    ranges_ = newRanges;
+    rangesLinear_ = newRanges;
 
     std::cout << " => "
-              << Util::vecToStr(ranges_).c_str()
+              << Util::vecToStr(rangesLinear_).c_str()
               << std::endl;
 }
 
-void RangeManager::del(int start, int end)
+void RangeManager::delLinear(int start, int end)
 {
     auto range = std::make_unique<Range>(start, end);
     if (!range->valid())
@@ -61,7 +108,7 @@ void RangeManager::del(int start, int end)
     }
 
     // nothing to delete from already empty range
-    if (ranges_.size() == 0)
+    if (rangesLinear_.size() == 0)
     {
         return;
     }
@@ -71,20 +118,63 @@ void RangeManager::del(int start, int end)
     Util::printVec(remove);
 
     std::vector<int> newRange;
-    std::set_difference(ranges_.begin(), ranges_.end(),
+    std::set_difference(rangesLinear_.begin(), rangesLinear_.end(),
                         remove.begin(), remove.end(),
                         std::inserter(newRange, newRange.begin()));
 
-    // TODO: copy is expensive
-    ranges_ = newRange;
+    rangesLinear_ = newRange;
 
     std::cout << " => "
-              << Util::vecToStr(ranges_).c_str()
+              << Util::vecToStr(rangesLinear_).c_str()
               << std::endl;
-
 }
 
-std::vector<Range *> RangeManager::get(int start, int end) const
+void RangeManager::del(int start, int end)
+{
+    Range delRange(start, end);
+    if (!delRange.valid())
+    {
+        return;
+    }
+
+    std::vector<Range> ranges;
+    for (auto & range : ranges_)
+    {
+        if (range.intersects(delRange))
+        {
+            std::vector<Range> remainderRanges = range.del(delRange);
+            ranges.insert(ranges.end(), remainderRanges.begin(), remainderRanges.end());
+        }
+        else
+        {
+            ranges.push_back(range);
+        }
+    }
+
+    ranges_ = ranges;
+}
+
+std::vector<Range> RangeManager::get(int start, int end) const
+{
+    Range getRange(start, end);
+    if (!getRange.valid())
+    {
+        std::vector<Range>();
+    }
+
+    std::vector<Range> result;
+    for (auto const& range : ranges_)
+    {
+        if (range.intersects(getRange))
+        {
+            result.push_back(range);
+        }
+    }
+
+    return result;
+}
+
+std::vector<Range *> RangeManager::getLinear(int start, int end) const
 {
     auto range = std::make_unique<Range>(start, end);
 
@@ -97,14 +187,13 @@ std::vector<Range *> RangeManager::get(int start, int end) const
     }
 
     std::vector<Range*> result;
-    std::vector<int> current = ranges_;
+    std::vector<int> current = rangesLinear_;
 
     auto notSucc = [](int x, int y)
     {
         return (y != x + 1);
     };
 
-    // TODO: improve: alg and pointers
     auto first = current.begin();
     auto n = std::adjacent_find(first, current.end(), notSucc);
     while (n != current.end())
@@ -131,6 +220,17 @@ std::vector<Range *> RangeManager::get(int start, int end) const
 
 std::vector<int> RangeManager::toVec() const
 {
-    return ranges_;
+    std::vector<int> ranges;
+    for (auto const& range : ranges_)
+    {
+        std::vector<int> curRange = range.toVec();
+        ranges.insert(ranges.end(), curRange.begin(), curRange.end());
+    }
+    return ranges;
+}
+
+std::vector<int> RangeManager::toVecLinear() const
+{
+    return rangesLinear_;
 }
 
