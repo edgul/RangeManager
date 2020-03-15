@@ -164,6 +164,19 @@ TEST_CASE( "Range test", "[Range]" )
         REQUIRE(r7.toVec() == Util::genSequence(-1000, 1000));
         REQUIRE(r8.toVec() == Util::genSequence(-10000, 10000));
     }
+
+    SECTION("Range add")
+    {
+        Range r1(1,10);
+        Range r2(10,20);
+        Range r3(15,20);
+        REQUIRE(r1.add(r2) == std::vector<Range>{Range(1,20)});
+        REQUIRE(r2.add(r1) == std::vector<Range>{Range(1,20)});
+        REQUIRE(r1.add(r3) == std::vector<Range>{Range(1,10), Range(15,20)});
+        REQUIRE(r3.add(r1) == std::vector<Range>{Range(1,10), Range(15,20)});
+        REQUIRE(r2.add(r3) == std::vector<Range>{Range(10,20)});
+        REQUIRE(r3.add(r2) == std::vector<Range>{Range(10,20)});
+    }
 }
 
 TEST_CASE("RangeManager Add/Del", "[RangeManager Add/Del]")
