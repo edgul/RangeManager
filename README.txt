@@ -41,9 +41,3 @@ Building with CLI (g++):
 1. "make clean"
 2. "make build" for main or "make test" for test build
 3. ./rangeManager(.exe)
-
-
---- TODO:
-
-* Optimizations
--> Copying
