@@ -20,7 +20,7 @@ public:
     void clearLinear();
     void addLinear(int start, int end);
     void delLinear(int start, int end);
-    std::vector<Range*> getLinear(int start, int end) const;
+    std::vector<Range> getLinear(int start, int end) const;
     std::vector<int> toVecLinear() const;
 
 private:

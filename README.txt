@@ -32,6 +32,6 @@ Building with CLI (g++):
 --- TODO:
 
 * Optimizations
--> Leaks/copies
+-> Copying
 * Debug switch for live printing
 * Test on Linux
