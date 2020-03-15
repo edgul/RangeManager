@@ -1,7 +1,21 @@
 RangeManager
 ************
+
 A simple class for working with integer ranges.
-Includes tests (Catch)
+I have included two versions to use depending on one's needs.
+Both are tested in Tests.cpp (using Catch)
+
+RangeManager
+* Allows adding, deleting and getting of Ranges
+* Faster: O(ranges) -> linear time relative to the number of ranges
+* Smaller cached memory footprint
+* Harder to maintain: uses more custom functions
+
+RangeManagerLinear (my first attempt)
+* Same functionality
+* Slower: O(values) -> linear time relative to the number of values in all the ranges
+* Larger cached memory footprint
+* Easier to maintain: Uses common STL functions
 
 --- Assumptions:
 

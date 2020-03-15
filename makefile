@@ -1,7 +1,7 @@
 CC=g++
-STD=-std=c++14
+STD=-std=c++17
 TARGET=rangeManager
-MODULES=Range.cpp RangeManager.cpp Util.cpp main.cpp
+MODULES=Range.cpp RangeManager.cpp RangeManagerLinear.cpp Util.cpp main.cpp
 
 test:
 	$(CC) $(STD) -DTEST_BUILD -o $(TARGET) $(MODULES)
