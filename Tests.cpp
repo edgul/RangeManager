@@ -4,22 +4,44 @@
 #include <numeric>
 #include "Range.h"
 #include "RangeManager.h"
+#include "RangeManagerLinear.h"
 #include "Util.h"
 #include "catch.hpp"
 
-void compareRange(const Range &range1, const Range &range2)
-{
-    REQUIRE(range1 == range2);
-    REQUIRE(range1.start() == range1.start());
-    REQUIRE(range1.end() == range2.end());
-    REQUIRE(range1.toVec() == range2.toVec());
-}
+void compareRange(const Range &range1, const Range &range2);
+void rangeManagerGet(IRangeManager &rm);
+void rangeManagerAddDel(IRangeManager &rm);
+
 
 TEST_CASE( "Util test", "[Util]")
 {
     REQUIRE(Util::genSequence(1,10) == std::vector<int>{1,2,3,4,5,6,7,8,9});
     REQUIRE(Util::genSequence(-10,0) == std::vector<int>{-10,-9,-8,-7,-6,-5,-4,-3,-2,-1});
     REQUIRE(Util::genSequence(-10,10) == std::vector<int>{-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9});
+}
+
+TEST_CASE("RangeManager Add/Del", "[RangeManager Add/Del]")
+{
+    RangeManager rm;
+    rangeManagerAddDel(rm);
+}
+
+TEST_CASE("RangeManagerLinear Add/Del", "[RangeMangerLinear Add/Del]")
+{
+    RangeManagerLinear rml;
+    rangeManagerAddDel(rml);
+}
+
+TEST_CASE("RangeManager Get", "[RangeManager Get]")
+{
+    RangeManager rm;
+    rangeManagerGet(rm);
+}
+
+TEST_CASE("RangeManagerLinear Get", "[RangeMangerLinear Get}")
+{
+    RangeManagerLinear rml;
+    rangeManagerGet(rml);
 }
 
 TEST_CASE( "Range test", "[Range]" )
@@ -247,10 +269,112 @@ TEST_CASE( "Range test", "[Range]" )
     }
 }
 
-TEST_CASE("RangeManager Add/Del", "[RangeManager Add/Del]")
+void compareRange(const Range &range1, const Range &range2)
 {
-    RangeManager rm;
+    REQUIRE(range1 == range2);
+    REQUIRE(range1.start() == range1.start());
+    REQUIRE(range1.end() == range2.end());
+    REQUIRE(range1.toVec() == range2.toVec());
+}
 
+void rangeManagerGet(IRangeManager &rm)
+{
+    rm.add(1,10);
+    SECTION("Get more than set")
+    {
+        std::vector<Range> r = rm.get(1,30);
+        REQUIRE((rm.get(1,10).at(0)) == Range(1,10));
+        REQUIRE(rm.get(1,10).at(0).start() == 1);
+        REQUIRE(rm.get(1,10).at(0).end() == 10);
+        REQUIRE(rm.get(1,10).at(0).toVec() == std::vector<int>{1,2,3,4,5,6,7,8,9});
+    }
+
+    rm.add(20,30);
+    SECTION("Get all of two ranges")
+    {
+        std::vector<Range> r = rm.get(1,30);
+        REQUIRE(r.size() == 2);
+
+        compareRange((r.at(0)), Range(1,10));
+        compareRange((r.at(1)), Range(20,30));
+    }
+
+    rm.add(40,50);
+    SECTION("Get first two of three by whole overlap ")
+    {
+        std::vector<Range> r = rm.get(1,30);
+        REQUIRE(r.size() == 2);
+
+        compareRange((r.at(0)), Range(1,10));
+        compareRange((r.at(1)), Range(20,30));
+    }
+    SECTION("Get second two of three by whole overlap")
+    {
+        std::vector<Range> r = rm.get(10, 50);
+        REQUIRE(r.size() == 2);
+
+        compareRange((r.at(0)), Range(20,30));
+        compareRange((r.at(1)), Range(40,50));
+    }
+    SECTION("Get first two of three by partial overlap ")
+    {
+        std::vector<Range> r = rm.get(5,25);
+        REQUIRE(r.size() == 2);
+
+        compareRange((r.at(0)), Range(1,10));
+        compareRange((r.at(1)), Range(20,30));
+    }
+    SECTION("Get second two of three by partial overlap")
+    {
+        std::vector<Range> r = rm.get(25, 45);
+        REQUIRE(r.size() == 2);
+        compareRange((r.at(0)), Range(20,30));
+        compareRange((r.at(1)), Range(40,50));
+    }
+
+    SECTION("Get middle of three by whole overlap")
+    {
+        std::vector<Range> r = rm.get(20, 30);
+        REQUIRE(r.size() == 1);
+        compareRange((r.at(0)), Range(20,30));
+    }
+    SECTION("Get middle of three by whole overlap bottom excess")
+    {
+        std::vector<Range> r = rm.get(15, 30);
+        REQUIRE(r.size() == 1);
+        compareRange((r.at(0)), Range(20,30));
+    }
+    SECTION("Get middle of three by whole overlap top excess")
+    {
+        std::vector<Range> r = rm.get(20, 34);
+        REQUIRE(r.size() == 1);
+        compareRange((r.at(0)), Range(20,30));
+    }
+
+    SECTION("Get bottom miss")
+    {
+        std::vector<Range> r = rm.get(-10, 1);
+        REQUIRE(r.size() == 0);
+    }
+    SECTION("Get mid miss 1")
+    {
+        std::vector<Range> r = rm.get(15,18);
+        REQUIRE(r.size() == 0);
+    }
+    SECTION("Get mid miss 2")
+    {
+        std::vector<Range> r = rm.get(30,40);
+        REQUIRE(r.size() == 0);
+    }
+    SECTION("Get top miss")
+    {
+        std::vector<Range> r = rm.get(50,55);
+        REQUIRE(r.size() == 0);
+    }
+}
+
+void rangeManagerAddDel(IRangeManager &rm)
+{
     std::vector<int> vec;
     SECTION("Default Range Manager is empty")
     {
@@ -399,103 +523,3 @@ TEST_CASE("RangeManager Add/Del", "[RangeManager Add/Del]")
         }
     }
 }
-
-TEST_CASE("RangeManager Get", "[RangeManager Get]")
-{
-    RangeManager rm;
-    rm.add(1,10);
-    SECTION("Get more than set")
-    {
-        std::vector<Range> r = rm.get(1,30);
-        REQUIRE((rm.get(1,10).at(0)) == Range(1,10));
-        REQUIRE(rm.get(1,10).at(0).start() == 1);
-        REQUIRE(rm.get(1,10).at(0).end() == 10);
-        REQUIRE(rm.get(1,10).at(0).toVec() == std::vector<int>{1,2,3,4,5,6,7,8,9});
-    }
-
-    rm.add(20,30);
-    SECTION("Get all of two ranges")
-    {
-        std::vector<Range> r = rm.get(1,30);
-        REQUIRE(r.size() == 2);
-
-        compareRange((r.at(0)), Range(1,10));
-        compareRange((r.at(1)), Range(20,30));
-    }
-
-    rm.add(40,50);
-    SECTION("Get first two of three by whole overlap ")
-    {
-        std::vector<Range> r = rm.get(1,30);
-        REQUIRE(r.size() == 2);
-
-        compareRange((r.at(0)), Range(1,10));
-        compareRange((r.at(1)), Range(20,30));
-    }
-    SECTION("Get second two of three by whole overlap")
-    {
-        std::vector<Range> r = rm.get(10, 50);
-        REQUIRE(r.size() == 2);
-
-        compareRange((r.at(0)), Range(20,30));
-        compareRange((r.at(1)), Range(40,50));
-    }
-    SECTION("Get first two of three by partial overlap ")
-    {
-        std::vector<Range> r = rm.get(5,25);
-        REQUIRE(r.size() == 2);
-
-        compareRange((r.at(0)), Range(1,10));
-        compareRange((r.at(1)), Range(20,30));
-    }
-    SECTION("Get second two of three by partial overlap")
-    {
-        std::vector<Range> r = rm.get(25, 45);
-        REQUIRE(r.size() == 2);
-        compareRange((r.at(0)), Range(20,30));
-        compareRange((r.at(1)), Range(40,50));
-    }
-
-    SECTION("Get middle of three by whole overlap")
-    {
-        std::vector<Range> r = rm.get(20, 30);
-        REQUIRE(r.size() == 1);
-        compareRange((r.at(0)), Range(20,30));
-    }
-    SECTION("Get middle of three by whole overlap bottom excess")
-    {
-        std::vector<Range> r = rm.get(15, 30);
-        REQUIRE(r.size() == 1);
-        compareRange((r.at(0)), Range(20,30));
-    }
-    SECTION("Get middle of three by whole overlap top excess")
-    {
-        std::vector<Range> r = rm.get(20, 34);
-        REQUIRE(r.size() == 1);
-        compareRange((r.at(0)), Range(20,30));
-    }
-
-    SECTION("Get bottom miss")
-    {
-        std::vector<Range> r = rm.get(-10, 1);
-        REQUIRE(r.size() == 0);
-    }
-    SECTION("Get mid miss 1")
-    {
-        std::vector<Range> r = rm.get(15,18);
-        REQUIRE(r.size() == 0);
-    }
-    SECTION("Get mid miss 2")
-    {
-        std::vector<Range> r = rm.get(30,40);
-        REQUIRE(r.size() == 0);
-    }
-    SECTION("Get top miss")
-    {
-        std::vector<Range> r = rm.get(50,55);
-        REQUIRE(r.size() == 0);
-    }
-}
-
-
-

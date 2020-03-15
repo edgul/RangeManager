@@ -20,6 +20,7 @@ DEFINES += TEST_BUILD
 SOURCES += \
         Range.cpp \
         RangeManager.cpp \
+        RangeManagerLinear.cpp \
         Tests.cpp \
         Util.cpp \
         main.cpp
@@ -30,8 +31,10 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    IRangeManager.h \
     Range.h \
     RangeManager.h \
+    RangeManagerLinear.h \
     Util.h \
     catch.hpp
 
