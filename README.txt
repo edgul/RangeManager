@@ -30,7 +30,7 @@ Integer-only ranges
 Tested on:
 * C++: 14, 17
 * Compilers: MSVC, GCC
-* Windows
+* Windows, Linux
 
 Building with Qt (MSVC):
 1. Set .pro file line: "DEFINES += TEST_BUILD" as desired for main or test build
@@ -47,5 +47,3 @@ Building with CLI (g++):
 
 * Optimizations
 -> Copying
-* Debug switch for live printing
-* Test on Linux
