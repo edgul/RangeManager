@@ -1,6 +1,5 @@
 #include "RangeManagerLinear.h"
 
-#include <iostream>
 #include <algorithm>
 #include <iterator>
 #include <memory>
@@ -21,15 +20,10 @@ void RangeManagerLinear::add(int start, int end)
     Range range(start, end);
     if (!range.valid())
     {
-        std::cout << "Invalid range provided (add): ";
-        std::cout << range.toStr().c_str();
-        std::cout << std::endl;
         return;
     }
 
     std::vector<int> add = range.toVec();
-    std::cout << "Adding: ";
-    Util::printVec(add);
 
     // merge (keeps sorted)
     std::vector<int> newRanges;
@@ -42,10 +36,6 @@ void RangeManagerLinear::add(int start, int end)
     newRanges.erase(last, newRanges.end());
 
     ranges_ = newRanges;
-
-    std::cout << " => "
-              << Util::vecToStr(ranges_).c_str()
-              << std::endl;
 }
 
 void RangeManagerLinear::del(int start, int end)
@@ -54,9 +44,6 @@ void RangeManagerLinear::del(int start, int end)
     Range range(start, end);
     if (!range.valid())
     {
-        std::cout << "Invalid range provided (del): ";
-        std::cout << range.toStr().c_str();
-        std::cout << std::endl;
         return;
     }
 
@@ -67,8 +54,6 @@ void RangeManagerLinear::del(int start, int end)
     }
 
     std::vector<int> remove = range.toVec();
-    std::cout << "Deleting: ";
-    Util::printVec(remove);
 
     std::vector<int> newRange;
     std::set_difference(ranges_.begin(), ranges_.end(),
@@ -76,13 +61,6 @@ void RangeManagerLinear::del(int start, int end)
                         std::inserter(newRange, newRange.begin()));
 
     ranges_ = newRange;
-
-    std::cout << " => "
-              << Util::vecToStr(ranges_).c_str()
-              << std::endl;
-
-
-
 }
 
 std::vector<Range> RangeManagerLinear::get(int start, int end) const
@@ -91,9 +69,6 @@ std::vector<Range> RangeManagerLinear::get(int start, int end) const
 
     if (!range.valid())
     {
-        std::cout << "Invalid range provided (get): ";
-        std::cout << range.toStr().c_str();
-        std::cout << std::endl;
         return std::vector<Range>();
     }
 
